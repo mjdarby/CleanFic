@@ -9,8 +9,8 @@ OperandType = Enum('OperandType', 'Large Small Variable')
 Alphabet = Enum('Alphabet', 'A0 A1 A2')
 
 # Statics
-NeedBranchOffset = ["jin","jg","jl","je","inc_chk","dec_chk","jz","get_child","get_sibling","save1","restore1","test_attr","test","verify", "scan_table", "piracy", "check_arg_count"]
-NeedStoreVariable = ["call","and","get_parent","get_child","get_sibling","get_prop","add","sub","mul","div","mod","loadw","loadb", "get_prop_addr", "get_prop_len", "get_next_prop", "random", "load", "and", "or", "not", "call_2s", "call_vs2", "call_1s", "call_vs", "read_char", "scan_table", "save4", "restore4", "art_shift", "log_shift", "set_font", "read5", "save_undo", "catch"]
+NeedBranchOffset = ["jin","jg","jl","je","inc_chk","dec_chk","jz","get_child","get_sibling","save1","restore1","test_attr","test","verify"]
+NeedStoreVariable = ["call","and","get_parent","get_child","get_sibling","get_prop","add","sub","mul","div","mod","loadw","loadb", "get_prop_addr", "get_prop_len", "get_next_prop", "random", "load", "and", "or", "not", "call_2s", "call_vs2", "call_1s", "call_vs"]
 NeedTextLiteral = ["print","print_ret"]
 
 def needsStoreVariable(opcode):
@@ -493,8 +493,6 @@ class Instruction:
     Instruction.opcodeMap[Operand.TwoOP][0x18] = ("mod", Instruction.mod)
     Instruction.opcodeMap[Operand.TwoOP][0x19] = ("call_2s", Instruction.call)
     Instruction.opcodeMap[Operand.TwoOP][0x1A] = ("call_2n", Instruction.call)
-    Instruction.opcodeMap[Operand.TwoOP][0x1B] = ("set_colour", Instruction.set_colour)
-    Instruction.opcodeMap[Operand.TwoOP][0x1C] = ("throw", Instruction.throw)
 
     Instruction.opcodeMap[Operand.OneOP] = {}
     Instruction.opcodeMap[Operand.OneOP][0x0] = ("jz", Instruction.jz)
@@ -512,82 +510,34 @@ class Instruction:
     Instruction.opcodeMap[Operand.OneOP][0xc] = ("jump", Instruction.jump)
     Instruction.opcodeMap[Operand.OneOP][0xd] = ("print_paddr", Instruction.print_paddr)
     Instruction.opcodeMap[Operand.OneOP][0xe] = ("load", Instruction.load)
-    if game.version < 5:
-      Instruction.opcodeMap[Operand.OneOP][0xf] = ("not", Instruction.not_1)
-    else:
-      Instruction.opcodeMap[Operand.OneOP][0xf] = ("call_1n", Instruction.call)
 
     Instruction.opcodeMap[Operand.ZeroOP] = {}
     Instruction.opcodeMap[Operand.ZeroOP][0x0] = ("rtrue", Instruction.rtrue)
     Instruction.opcodeMap[Operand.ZeroOP][0x1] = ("rfalse", Instruction.rfalse)
     Instruction.opcodeMap[Operand.ZeroOP][0x2] = ("print", Instruction.print_1)
     Instruction.opcodeMap[Operand.ZeroOP][0x3] = ("print_ret", Instruction.print_ret)
-    Instruction.opcodeMap[Operand.ZeroOP][0x4] = ("nop", Instruction.nop)
-    if game.version < 4:
-      Instruction.opcodeMap[Operand.ZeroOP][0x5] = ("save1", Instruction.save)
-    else:
-      Instruction.opcodeMap[Operand.ZeroOP][0x5] = ("save4", Instruction.save)
-    if game.version < 4:
-      Instruction.opcodeMap[Operand.ZeroOP][0x6] = ("restore1", Instruction.restore)
-    else:
-      Instruction.opcodeMap[Operand.ZeroOP][0x6] = ("restore4", Instruction.restore)
+    Instruction.opcodeMap[Operand.ZeroOP][0x5] = ("save1", Instruction.save)
+    Instruction.opcodeMap[Operand.ZeroOP][0x6] = ("restore1", Instruction.restore)
     Instruction.opcodeMap[Operand.ZeroOP][0x7] = ("restart", Instruction.restart)
     Instruction.opcodeMap[Operand.ZeroOP][0x8] = ("ret_popped", Instruction.ret_popped)
-    if game.version < 5:
-      Instruction.opcodeMap[Operand.ZeroOP][0x9] = ("pop", Instruction.pop)
-    else:
-      Instruction.opcodeMap[Operand.ZeroOP][0x9] = ("catch", Instruction.catch)
     Instruction.opcodeMap[Operand.ZeroOP][0xa] = ("quit", Instruction.quit)
     Instruction.opcodeMap[Operand.ZeroOP][0xb] = ("new_line", Instruction.new_line)
-    Instruction.opcodeMap[Operand.ZeroOP][0xc] = ("show_status", Instruction.show_status)
     Instruction.opcodeMap[Operand.ZeroOP][0xd] = ("verify", Instruction.verify)
-    Instruction.opcodeMap[Operand.ZeroOP][0xf] = ("piracy", Instruction.piracy)
 
     Instruction.opcodeMap[Operand.VAR] = {}
     Instruction.opcodeMap[Operand.VAR][224] = ("call", Instruction.call)
     Instruction.opcodeMap[Operand.VAR][225] = ("storew", Instruction.storew)
     Instruction.opcodeMap[Operand.VAR][226] = ("storeb", Instruction.storeb)
     Instruction.opcodeMap[Operand.VAR][227] = ("put_prop", Instruction.put_prop)
-    if game.version < 5:
-      Instruction.opcodeMap[Operand.VAR][228] = ("read", Instruction.read)
-    else:
-      Instruction.opcodeMap[Operand.VAR][228] = ("read5", Instruction.read)
+    Instruction.opcodeMap[Operand.VAR][228] = ("read", Instruction.read)
     Instruction.opcodeMap[Operand.VAR][229] = ("print_char", Instruction.print_char)
     Instruction.opcodeMap[Operand.VAR][230] = ("print_num", Instruction.print_num)
     Instruction.opcodeMap[Operand.VAR][231] = ("random", Instruction.random)
     Instruction.opcodeMap[Operand.VAR][232] = ("push", Instruction.push)
     Instruction.opcodeMap[Operand.VAR][233] = ("pull", Instruction.pull)
-    Instruction.opcodeMap[Operand.VAR][234] = ("split_window", Instruction.split_window)
-    Instruction.opcodeMap[Operand.VAR][235] = ("set_window", Instruction.set_window)
     Instruction.opcodeMap[Operand.VAR][236] = ("call_vs2", Instruction.call)
-    Instruction.opcodeMap[Operand.VAR][237] = ("erase_window", Instruction.erase_window)
-    Instruction.opcodeMap[Operand.VAR][238] = ("erase_line", Instruction.erase_line)
-    Instruction.opcodeMap[Operand.VAR][239] = ("set_cursor", Instruction.set_cursor)
-    Instruction.opcodeMap[Operand.VAR][240] = ("get_cursor", Instruction.get_cursor)
-    Instruction.opcodeMap[Operand.VAR][241] = ("set_text_style", Instruction.set_text_style)
-    Instruction.opcodeMap[Operand.VAR][242] = ("buffer_mode", Instruction.buffer_mode)
-    Instruction.opcodeMap[Operand.VAR][243] = ("output_stream", Instruction.output_stream)
-    Instruction.opcodeMap[Operand.VAR][244] = ("input_stream", Instruction.input_stream)
-    Instruction.opcodeMap[Operand.VAR][245] = ("sound_effect", Instruction.sound_effect)
-    Instruction.opcodeMap[Operand.VAR][246] = ("read_char", Instruction.read_char)
-    Instruction.opcodeMap[Operand.VAR][247] = ("scan_table", Instruction.scan_table)
-    Instruction.opcodeMap[Operand.VAR][248] = ("not", Instruction.not_1)
     Instruction.opcodeMap[Operand.VAR][249] = ("call_vn", Instruction.call)
     Instruction.opcodeMap[Operand.VAR][250] = ("call_vn2", Instruction.call)
-    Instruction.opcodeMap[Operand.VAR][251] = ("tokenise", Instruction.tokenise)
-    Instruction.opcodeMap[Operand.VAR][252] = ("encode_text", Instruction.encode_text)
-    Instruction.opcodeMap[Operand.VAR][253] = ("copy_table", Instruction.copy_table)
-    Instruction.opcodeMap[Operand.VAR][254] = ("print_table", Instruction.print_table)
-    Instruction.opcodeMap[Operand.VAR][255] = ("check_arg_count", Instruction.check_arg_count)
-
-    Instruction.opcodeMap["EXT"] = {}
-    Instruction.opcodeMap["EXT"][0x0] = ("save4", Instruction.save)
-    Instruction.opcodeMap["EXT"][0x1] = ("restore4", Instruction.restore)
-    Instruction.opcodeMap["EXT"][0x2] = ("log_shift", Instruction.log_shift)
-    Instruction.opcodeMap["EXT"][0x3] = ("art_shift", Instruction.art_shift)
-    Instruction.opcodeMap["EXT"][0x4] = ("set_font", Instruction.set_font)
-    Instruction.opcodeMap["EXT"][0x9] = ("save_undo", Instruction.save_undo)
-    Instruction.opcodeMap["EXT"][0xA] = ("restore_undo", Instruction.restore_undo)
 
 def main():
   # Load up the game
