@@ -1,0 +1,9 @@
+__pycache__
+*.pyc
+*~
+*.z*
+*.pdf
+*.txt
+*.dis
+*.inf
+crontab
